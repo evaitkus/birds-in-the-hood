@@ -1,4 +1,27 @@
 <html>
+  <head>
+    <style>
+      .top-stuff {
+        text-align: center;
+        font-family: "Graffiti font", sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 10px;
+        margin-top: 10px;
+      }
+
+      .middle-stuff {
+        font-family: times new roman;
+        font-size: 17px;
+      }
+      .lower-stuff {
+        color: #0a634f;
+        text-align: center;
+        font-weight: bold;
+        font-family: times new roman;
+      }
+    </style>
+  </head>
 <link href="http://fonts.cdnfonts.com/css/graffiti-font" rel="stylesheet">
 <section class=top-stuff>
 
@@ -22,4 +45,60 @@
         <p id="other"></p>
     </section>
         
+  
+  <script>
+    function setBodyText(text) {
+      document.getElementById("output").innerHTML = text;
+    }
+
+    function erasePage() {
+      setBodyText("");
+      // document.getElementById("output").innerHTML = " ";
+      document.getElementById("other").innerHTML = " ";
+    }
+
+    function getBirds() {
+      const inputLat = document.getElementById("lat").value;
+      const inputLong = document.getElementById("long").value;
+      const apiUrl = `https://api.ebird.org/v2/data/obs/geo/recent?key=m59ivbcroo53&lat=${inputLat}&lng=${inputLong}&maxResults=3`;
+      //document.getElementById("other").innerHTML = "Try another location!";
+
+      if (inputLat == "" || inputLong == "") {
+        console.error(
+          "Oops, we need input for latitude and longitude to two decimal places"
+        );
+
+        return;
+      }
+      erasePage() 
+      fetch(apiUrl)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (Object.keys(data).includes("errors")) {
+            setBodyText("that is not a real place?");
+            return;
+          }
+
+          if (data.length == 0) {
+            setBodyText("there's no data for this location :( try another");
+            return;
+          }
+          data.forEach(function (birdData) {
+            console.log(birdData.comName);
+            document.getElementById("output").innerHTML +=
+              "Somebody reported spotting a(n) <br>" +
+              birdData.comName +
+              " on " +
+              birdData.obsDt +
+              ". <br><br>";
+
+
+          });
+        });
+    }
+
+
+  </script>
   </html>
